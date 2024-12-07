@@ -1,0 +1,2234 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Predicting Heart Disease Diagnosis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="project_files/libs/clipboard/clipboard.min.js"></script>
+<script src="project_files/libs/quarto-html/quarto.js"></script>
+<script src="project_files/libs/quarto-html/popper.min.js"></script>
+<script src="project_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="project_files/libs/quarto-html/anchor.min.js"></script>
+<link href="project_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="project_files/libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="project_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="project_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="project_files/libs/bootstrap/bootstrap-8a79a254b8e706d3c925cde0a310d4f0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Predicting Heart Disease Diagnosis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level3">
+<h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
+<p>The cardiovascular system encompasses an intricate network of blood vessels, including veins, arteries, and capillaries, which facilitate the circulation of blood throughout the body. Any disruptions in the flow of blood emanating from the heart can lead to various forms of heart diseases, collectively referred to as cardiovascular or heart diseases. Globally, heart diseases constitute a leading cause of mortality - the World Health Organization (WHO) indicates that approximately 17.5 million deaths annually are attributable to heart attacks and strokes. Consequently, the early detection of cardiac anomalies is imperative as it can significantly save lives and assist healthcare professionals in crafting effective treatment strategies.</p>
+<p>In this study, we will examine a dataset that contains test results from 303 patients referred for coronary angiography at the Cleveland Clinic in Ohio between May 1981 and September 1984. All the patients had similar medical profiles and underwent the same non-invasive tests, namely, exercise electrocardiogram, exercise thallium scintigraphy and fluoroscopy for coronary calcium.</p>
+<p>The clinical and test variables included in this dataset are per the below, while the target variable is the angiographic disease status <code>num</code>, where the value 0 corresponds to the major vessels show less than 50% narrowing of the vessels diameter while the values 1 and more correspond to showing greater than 50% narrowing of the vessels diameter.</p>
+<p>The variables represent the following <br> <strong>Demographic Information:</strong> - Age (<code>age</code>) - Sex (<code>sex</code>) - 1 = Male - 0 = Female</p>
+<p><strong>Clinical Information:</strong> - Chest Pain Type (<code>cp</code>) - 1 = Typical Anginal - 2 = Atypical Anginal - 3 = Nonanginal - 4 = Asymptomatic - Systolic Blood Pressure (<code>trestbps</code>) - in mmHg on admission to the hospital</p>
+<p><strong>Routine Test Data Collected:</strong> - Serum Cholesterol Determination (<code>chol</code>) - in mg/dl - Fasting Blood Sugar Determination (<code>fbs</code>) - fasting blood sugar &gt; 120 mg/dl) - 1 = True - 0 = False - Resting Electrocardiographic Results (<code>restecg</code>) - 0 = Normal - 1 = Having ST-T Wave Abnormality - 2 = Showing Probable or Definite Left Ventricular Hypertrophy by Estes’ Criteria</p>
+<p><strong>Exercise Test Data Collected:</strong> - Maximum Heart Rate Achieved (<code>thalach</code>) - in beats per minute - Exercise Induced Angina (<code>exang</code>) - 1 = Yes - 0 = No - ST Depression Induced by Exercise Relative to Rest (<code>oldpeak</code>) - Slope of the Peak Exercise ST Segment (<code>slope</code>) - 1 = Upsloping - 2 = Flat - 3 = Downsloping</p>
+<p><strong>Other Non-invasive Test Data Collected:</strong> - Number of Major Vessels Colored by Fluoroscopy for Coronary Calcium (<code>ca</code>) - 0 to 3 - Exercise Thallium Scintigraphy Results (<code>thal</code>) - 3 = Normal - 6 = Fixed Defect - 7 = Reversible Defect</p>
+<p>In this study, we will address the predictive question: can we use clinical and test data available to us to predict a diagnosis of heart disease. This is important as it provides a quick and data-driven method to diagnose heart disease and eliminates subjectivity and dependence on the skill and experience of the diagnosing physician.</p>
+<p>Therefore we decided to define that we can use clinical and test data to predict a diagnosis of heart disease when the accuracy is greater than 55%. When the accuracy is lower than 55% we cannot use it to predict.</p>
+</section>
+<section id="methods-and-results" class="level3">
+<h3 class="anchored" data-anchor-id="methods-and-results">Methods and Results</h3>
+<p>Describe in written English the methods you used to perform your analysis from beginning to end that narrates the code the does the analysis. your report should include code which: - loads data from the original source on the web - DONE - wrangles and cleans the data from it’s original (downloaded) format to the -format necessary for the planned analysis - DONE - performs a summary of the data set that is relevant for exploratory data analysis related to the planned analysis - - creates a visualization of the dataset that is relevant for exploratory data analysis related to the planned analysis - performs the data analysis - creates a visualization of the analysis - note: all tables and figure should have a figure/table number and a legend</p>
+<div id="b4305718-5806-4322-bb0c-cc7a3e34c388" class="cell" data-tags="[]" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"kknn"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"GGally"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(repr)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kknn)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GGally)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">repr.matrix.max.rows =</span> <span class="dv">6</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">9999</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Installing package into 'C:/Users/rtian/AppData/Local/R/win-library/4.4'
+(as 'lib' is unspecified)
+
+also installing the dependencies 'magrittr', 'pkgconfig', 'cpp11', 'igraph'
+
+</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>package 'magrittr' successfully unpacked and MD5 sums checked
+package 'pkgconfig' successfully unpacked and MD5 sums checked
+package 'cpp11' successfully unpacked and MD5 sums checked
+package 'igraph' successfully unpacked and MD5 sums checked
+package 'kknn' successfully unpacked and MD5 sums checked
+
+The downloaded binary packages are in
+    C:\Users\rtian\AppData\Local\Temp\RtmpCaNqKP\downloaded_packages</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Installing package into 'C:/Users/rtian/AppData/Local/R/win-library/4.4'
+(as 'lib' is unspecified)
+
+also installing the dependencies 'stringi', 'colorspace', 'isoband', 'tibble', 'withr', 'generics', 'R6', 'tidyselect', 'purrr', 'stringr', 'forcats', 'patchwork', 'Rcpp', 'hms', 'prettyunits', 'farver', 'labeling', 'munsell', 'viridisLite', 'ggplot2', 'dplyr', 'tidyr', 'ggstats', 'gtable', 'plyr', 'progress', 'RColorBrewer', 'scales'
+
+</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>package 'stringi' successfully unpacked and MD5 sums checked
+package 'colorspace' successfully unpacked and MD5 sums checked
+package 'isoband' successfully unpacked and MD5 sums checked
+package 'tibble' successfully unpacked and MD5 sums checked
+package 'withr' successfully unpacked and MD5 sums checked
+package 'generics' successfully unpacked and MD5 sums checked
+package 'R6' successfully unpacked and MD5 sums checked
+package 'tidyselect' successfully unpacked and MD5 sums checked
+package 'purrr' successfully unpacked and MD5 sums checked
+package 'stringr' successfully unpacked and MD5 sums checked
+package 'forcats' successfully unpacked and MD5 sums checked
+package 'patchwork' successfully unpacked and MD5 sums checked
+package 'Rcpp' successfully unpacked and MD5 sums checked
+package 'hms' successfully unpacked and MD5 sums checked
+package 'prettyunits' successfully unpacked and MD5 sums checked
+package 'farver' successfully unpacked and MD5 sums checked
+package 'labeling' successfully unpacked and MD5 sums checked
+package 'munsell' successfully unpacked and MD5 sums checked
+package 'viridisLite' successfully unpacked and MD5 sums checked
+package 'ggplot2' successfully unpacked and MD5 sums checked
+package 'dplyr' successfully unpacked and MD5 sums checked
+package 'tidyr' successfully unpacked and MD5 sums checked
+package 'ggstats' successfully unpacked and MD5 sums checked
+package 'gtable' successfully unpacked and MD5 sums checked
+package 'plyr' successfully unpacked and MD5 sums checked
+package 'progress' successfully unpacked and MD5 sums checked
+package 'RColorBrewer' successfully unpacked and MD5 sums checked
+package 'scales' successfully unpacked and MD5 sums checked
+package 'GGally' successfully unpacked and MD5 sums checked
+
+The downloaded binary packages are in
+    C:\Users\rtian\AppData\Local\Temp\RtmpCaNqKP\downloaded_packages</code></pre>
+</div>
+<div class="cell-output cell-output-error">
+<pre><code>ERROR: Error in library(tidyverse): there is no package called 'tidyverse'
+
+Error in library(tidyverse): there is no package called 'tidyverse'
+Traceback:
+
+1. stop(packageNotFoundError(package, lib.loc, sys.call()))</code></pre>
+</div>
+</div>
+<div id="c6e25a27-9b75-4cea-a4a8-7338d2d7b28e" class="cell" data-tags="[]" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/Mikeee12138/Group-Project-dsci100/main/processed.cleveland.data"</span>, <span class="at">col_names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(heart_disease) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"cp"</span>, <span class="st">"trestbps"</span>, <span class="st">"chol"</span>, <span class="st">"fbs"</span>, <span class="st">"restecg"</span>, <span class="st">"thalach"</span>, <span class="st">"exang"</span>, <span class="st">"oldpeak"</span>, <span class="st">"slope"</span>, <span class="st">"ca"</span>, <span class="st">"thal"</span>, <span class="st">"num"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>heart_disease</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 303 Columns: 14
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (2): X12, X13
+dbl (12): X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X14
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A spec_tbl_df: 303 × 14</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">age</th>
+<th data-quarto-table-cell-role="th" scope="col">sex</th>
+<th data-quarto-table-cell-role="th" scope="col">cp</th>
+<th data-quarto-table-cell-role="th" scope="col">trestbps</th>
+<th data-quarto-table-cell-role="th" scope="col">chol</th>
+<th data-quarto-table-cell-role="th" scope="col">fbs</th>
+<th data-quarto-table-cell-role="th" scope="col">restecg</th>
+<th data-quarto-table-cell-role="th" scope="col">thalach</th>
+<th data-quarto-table-cell-role="th" scope="col">exang</th>
+<th data-quarto-table-cell-role="th" scope="col">oldpeak</th>
+<th data-quarto-table-cell-role="th" scope="col">slope</th>
+<th data-quarto-table-cell-role="th" scope="col">ca</th>
+<th data-quarto-table-cell-role="th" scope="col">thal</th>
+<th data-quarto-table-cell-role="th" scope="col">num</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>63</td>
+<td>1</td>
+<td>1</td>
+<td>145</td>
+<td>233</td>
+<td>1</td>
+<td>2</td>
+<td>150</td>
+<td>0</td>
+<td>2.3</td>
+<td>3</td>
+<td>0.0</td>
+<td>6.0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>67</td>
+<td>1</td>
+<td>4</td>
+<td>160</td>
+<td>286</td>
+<td>0</td>
+<td>2</td>
+<td>108</td>
+<td>1</td>
+<td>1.5</td>
+<td>2</td>
+<td>3.0</td>
+<td>3.0</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>67</td>
+<td>1</td>
+<td>4</td>
+<td>120</td>
+<td>229</td>
+<td>0</td>
+<td>2</td>
+<td>129</td>
+<td>1</td>
+<td>2.6</td>
+<td>2</td>
+<td>2.0</td>
+<td>7.0</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+</tr>
+<tr class="odd">
+<td>57</td>
+<td>1</td>
+<td>4</td>
+<td>130</td>
+<td>131</td>
+<td>0</td>
+<td>0</td>
+<td>115</td>
+<td>1</td>
+<td>1.2</td>
+<td>2</td>
+<td>1.0</td>
+<td>7.0</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>57</td>
+<td>0</td>
+<td>2</td>
+<td>130</td>
+<td>236</td>
+<td>0</td>
+<td>2</td>
+<td>174</td>
+<td>0</td>
+<td>0.0</td>
+<td>2</td>
+<td>1.0</td>
+<td>3.0</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>38</td>
+<td>1</td>
+<td>3</td>
+<td>138</td>
+<td>175</td>
+<td>0</td>
+<td>0</td>
+<td>173</td>
+<td>0</td>
+<td>0.0</td>
+<td>1</td>
+<td>?</td>
+<td>3.0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 1 - Heart Disease Dataset</font></p><font size="1">
+<p>The dataset appears to be clean and wrangled into a tidy format with the addition of the column headers. However, the two columns <code>ca</code> and <code>thal</code> appear to contain missing values signified by a “?” character. We shall filter the training dataset so that all the rows with missing values are eliminated. We will also change the type of the <code>ca</code> variable from to numeric so we can use numeric analysis methods on it and we will convert the categorical variable <code>num</code> into a factor.</p>
+<div id="32e5bfc8-4ac5-45e6-9320-246b35f02483" class="cell" data-tags="[]" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>heart_disease_filtered <span class="ot">&lt;-</span> heart_disease <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(ca <span class="sc">!=</span> <span class="st">"?"</span>, thal <span class="sc">!=</span> <span class="st">"?"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ca =</span> <span class="fu">as.numeric</span>(ca), <span class="at">num =</span> <span class="fu">as_factor</span>(num))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>heart_disease_filtered</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 297 × 14</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">age</th>
+<th data-quarto-table-cell-role="th" scope="col">sex</th>
+<th data-quarto-table-cell-role="th" scope="col">cp</th>
+<th data-quarto-table-cell-role="th" scope="col">trestbps</th>
+<th data-quarto-table-cell-role="th" scope="col">chol</th>
+<th data-quarto-table-cell-role="th" scope="col">fbs</th>
+<th data-quarto-table-cell-role="th" scope="col">restecg</th>
+<th data-quarto-table-cell-role="th" scope="col">thalach</th>
+<th data-quarto-table-cell-role="th" scope="col">exang</th>
+<th data-quarto-table-cell-role="th" scope="col">oldpeak</th>
+<th data-quarto-table-cell-role="th" scope="col">slope</th>
+<th data-quarto-table-cell-role="th" scope="col">ca</th>
+<th data-quarto-table-cell-role="th" scope="col">thal</th>
+<th data-quarto-table-cell-role="th" scope="col">num</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;fct&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>63</td>
+<td>1</td>
+<td>1</td>
+<td>145</td>
+<td>233</td>
+<td>1</td>
+<td>2</td>
+<td>150</td>
+<td>0</td>
+<td>2.3</td>
+<td>3</td>
+<td>0</td>
+<td>6.0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>67</td>
+<td>1</td>
+<td>4</td>
+<td>160</td>
+<td>286</td>
+<td>0</td>
+<td>2</td>
+<td>108</td>
+<td>1</td>
+<td>1.5</td>
+<td>2</td>
+<td>3</td>
+<td>3.0</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>67</td>
+<td>1</td>
+<td>4</td>
+<td>120</td>
+<td>229</td>
+<td>0</td>
+<td>2</td>
+<td>129</td>
+<td>1</td>
+<td>2.6</td>
+<td>2</td>
+<td>2</td>
+<td>7.0</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+</tr>
+<tr class="odd">
+<td>68</td>
+<td>1</td>
+<td>4</td>
+<td>144</td>
+<td>193</td>
+<td>1</td>
+<td>0</td>
+<td>141</td>
+<td>0</td>
+<td>3.4</td>
+<td>2</td>
+<td>2</td>
+<td>7.0</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td>57</td>
+<td>1</td>
+<td>4</td>
+<td>130</td>
+<td>131</td>
+<td>0</td>
+<td>0</td>
+<td>115</td>
+<td>1</td>
+<td>1.2</td>
+<td>2</td>
+<td>1</td>
+<td>7.0</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td>57</td>
+<td>0</td>
+<td>2</td>
+<td>130</td>
+<td>236</td>
+<td>0</td>
+<td>2</td>
+<td>174</td>
+<td>0</td>
+<td>0.0</td>
+<td>2</td>
+<td>1</td>
+<td>3.0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 2 - Heart Disease Data Set Filtered</font></p><font size="1">
+<p>Our categorical variable <code>num</code> is already factorized. However, since the intention of our analysis is to predict whether the target value is 0, signifying &lt;50% of diameter narrowing in the major vessels (i.e., no heart disease) or not, we can assign the non-zero values to the value 1. This is done to improve the accuracy of our classification since all other values imply heart disease at different extents but our prediction is strictly concerned with its existence.</p>
+<div id="cac753ab-00a3-48f9-9e1e-a0e69dcc68d3" class="cell" data-tags="[]" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>heart_disease_filtered[<span class="st">'num'</span>][heart_disease_filtered[<span class="st">'num'</span>] <span class="sc">==</span> <span class="st">'2'</span>] <span class="ot">&lt;-</span> <span class="st">'1'</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>heart_disease_filtered[<span class="st">'num'</span>][heart_disease_filtered[<span class="st">'num'</span>] <span class="sc">==</span> <span class="st">'3'</span>] <span class="ot">&lt;-</span> <span class="st">'1'</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>heart_disease_filtered[<span class="st">'num'</span>][heart_disease_filtered[<span class="st">'num'</span>] <span class="sc">==</span> <span class="st">'4'</span>] <span class="ot">&lt;-</span> <span class="st">'1'</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>heart_disease_filtered</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 297 × 14</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">age</th>
+<th data-quarto-table-cell-role="th" scope="col">sex</th>
+<th data-quarto-table-cell-role="th" scope="col">cp</th>
+<th data-quarto-table-cell-role="th" scope="col">trestbps</th>
+<th data-quarto-table-cell-role="th" scope="col">chol</th>
+<th data-quarto-table-cell-role="th" scope="col">fbs</th>
+<th data-quarto-table-cell-role="th" scope="col">restecg</th>
+<th data-quarto-table-cell-role="th" scope="col">thalach</th>
+<th data-quarto-table-cell-role="th" scope="col">exang</th>
+<th data-quarto-table-cell-role="th" scope="col">oldpeak</th>
+<th data-quarto-table-cell-role="th" scope="col">slope</th>
+<th data-quarto-table-cell-role="th" scope="col">ca</th>
+<th data-quarto-table-cell-role="th" scope="col">thal</th>
+<th data-quarto-table-cell-role="th" scope="col">num</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;fct&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>63</td>
+<td>1</td>
+<td>1</td>
+<td>145</td>
+<td>233</td>
+<td>1</td>
+<td>2</td>
+<td>150</td>
+<td>0</td>
+<td>2.3</td>
+<td>3</td>
+<td>0</td>
+<td>6.0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>67</td>
+<td>1</td>
+<td>4</td>
+<td>160</td>
+<td>286</td>
+<td>0</td>
+<td>2</td>
+<td>108</td>
+<td>1</td>
+<td>1.5</td>
+<td>2</td>
+<td>3</td>
+<td>3.0</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>67</td>
+<td>1</td>
+<td>4</td>
+<td>120</td>
+<td>229</td>
+<td>0</td>
+<td>2</td>
+<td>129</td>
+<td>1</td>
+<td>2.6</td>
+<td>2</td>
+<td>2</td>
+<td>7.0</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+</tr>
+<tr class="odd">
+<td>68</td>
+<td>1</td>
+<td>4</td>
+<td>144</td>
+<td>193</td>
+<td>1</td>
+<td>0</td>
+<td>141</td>
+<td>0</td>
+<td>3.4</td>
+<td>2</td>
+<td>2</td>
+<td>7.0</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>57</td>
+<td>1</td>
+<td>4</td>
+<td>130</td>
+<td>131</td>
+<td>0</td>
+<td>0</td>
+<td>115</td>
+<td>1</td>
+<td>1.2</td>
+<td>2</td>
+<td>1</td>
+<td>7.0</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>57</td>
+<td>0</td>
+<td>2</td>
+<td>130</td>
+<td>236</td>
+<td>0</td>
+<td>2</td>
+<td>174</td>
+<td>0</td>
+<td>0.0</td>
+<td>2</td>
+<td>1</td>
+<td>3.0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 3 - Heart Disease Data Set Filtered and Target Variable Factorized</font></p><font size="1">
+<p>Exploring this dataset further and in anticipation of the mutli-class classification with k-nn to follow, we check to see there are fairly equal number of observations in each class as that could have a negative effect on the accuracy score our classifier. We produce the following table to illustrate the number of each observation in the two classes.</p>
+<div id="ed9f034c-7ada-4429-b1ad-2996e74b92c7" class="cell" data-tags="[]" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">group_by</span>(heart_disease_filtered, num) <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>())</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 2 × 2</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">num</th>
+<th data-quarto-table-cell-role="th" scope="col">count</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;fct&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;int&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>160</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>137</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 4 - Number of Observations in each Class</font></p><font size="1">
+<p>Based on the above table, we see that the numbers of observations are within 14% from each other, implying that the classes are within an acceptable weighting on the data.</p>
+<p>As part of the balance of the exploratory data analysis, we will split the data into a training and test set, with <code>num</code> being the variable we want to classify.</p>
+<div id="46ee6f0e-05f6-4dc6-b131-2fa0079cef4f" class="cell" data-tags="[]" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>heart_disease_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(heart_disease_filtered , <span class="at">prop =</span> <span class="fl">0.75</span>, <span class="at">strata =</span> num) </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    heart_disease_train <span class="ot">&lt;-</span> <span class="fu">training</span>(heart_disease_split)   </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    heart_disease_test<span class="ot">&lt;-</span> <span class="fu">testing</span>(heart_disease_split)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    heart_disease_train</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 222 × 14</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">age</th>
+<th data-quarto-table-cell-role="th" scope="col">sex</th>
+<th data-quarto-table-cell-role="th" scope="col">cp</th>
+<th data-quarto-table-cell-role="th" scope="col">trestbps</th>
+<th data-quarto-table-cell-role="th" scope="col">chol</th>
+<th data-quarto-table-cell-role="th" scope="col">fbs</th>
+<th data-quarto-table-cell-role="th" scope="col">restecg</th>
+<th data-quarto-table-cell-role="th" scope="col">thalach</th>
+<th data-quarto-table-cell-role="th" scope="col">exang</th>
+<th data-quarto-table-cell-role="th" scope="col">oldpeak</th>
+<th data-quarto-table-cell-role="th" scope="col">slope</th>
+<th data-quarto-table-cell-role="th" scope="col">ca</th>
+<th data-quarto-table-cell-role="th" scope="col">thal</th>
+<th data-quarto-table-cell-role="th" scope="col">num</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;fct&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>63</td>
+<td>1</td>
+<td>1</td>
+<td>145</td>
+<td>233</td>
+<td>1</td>
+<td>2</td>
+<td>150</td>
+<td>0</td>
+<td>2.3</td>
+<td>3</td>
+<td>0</td>
+<td>6.0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>37</td>
+<td>1</td>
+<td>3</td>
+<td>130</td>
+<td>250</td>
+<td>0</td>
+<td>0</td>
+<td>187</td>
+<td>0</td>
+<td>3.5</td>
+<td>3</td>
+<td>0</td>
+<td>3.0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td>41</td>
+<td>0</td>
+<td>2</td>
+<td>130</td>
+<td>204</td>
+<td>0</td>
+<td>2</td>
+<td>172</td>
+<td>0</td>
+<td>1.4</td>
+<td>1</td>
+<td>0</td>
+<td>3.0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+</tr>
+<tr class="odd">
+<td>57</td>
+<td>0</td>
+<td>4</td>
+<td>140</td>
+<td>241</td>
+<td>0</td>
+<td>0</td>
+<td>123</td>
+<td>1</td>
+<td>0.2</td>
+<td>2</td>
+<td>0</td>
+<td>7.0</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>45</td>
+<td>1</td>
+<td>1</td>
+<td>110</td>
+<td>264</td>
+<td>0</td>
+<td>0</td>
+<td>132</td>
+<td>0</td>
+<td>1.2</td>
+<td>2</td>
+<td>0</td>
+<td>7.0</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>57</td>
+<td>1</td>
+<td>4</td>
+<td>130</td>
+<td>131</td>
+<td>0</td>
+<td>0</td>
+<td>115</td>
+<td>1</td>
+<td>1.2</td>
+<td>2</td>
+<td>1</td>
+<td>7.0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 5 - Training Data Set</font></p><font size="1">
+<p>Now for this study, we will conduct a classification prediction using the six non-categorical variables included in the above table. Categorical variables will not be used as they are not scaled and can lead to skewing the output, which leaves us with the following predictors: <code>age</code>, <code>trestbps</code>, <code>chol</code>, <code>thalach</code>, <code>oldpeak</code>, and <code>ca</code>.</p>
+<p>Before proceeding any further, we select the relevant columns from our training data set (six predictor variables and one target variable).</p>
+<div id="954b5fc3-7def-4545-bb66-421b7b499e1d" class="cell" data-tags="[]" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>heart_disease_train_predict <span class="ot">&lt;-</span> <span class="fu">select</span>(heart_disease_train, age, trestbps, chol, thalach, oldpeak, ca, num)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Using only the observations in the training data set, we use the ggpairs library to create a pairplot of all the columns we are interested in including in our models.</p>
+<p>From the last column, we can gather the relationship between the predictor variables and our target variable<code>num</code>.</p>
+<div id="6a282f84-5b18-499f-83d4-553221c592a1" class="cell" data-tags="[]" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">repr.plot.width =</span> <span class="dv">10</span>, <span class="at">repr.plot.height =</span> <span class="dv">10</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  heart_disease_pairplot <span class="ot">&lt;-</span> heart_disease_train_predict<span class="sc">|&gt;</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ggpairs</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">lower =</span> <span class="fu">list</span>(<span class="at">continuous =</span> <span class="fu">wrap</span>(<span class="st">'points'</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>)),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">diag =</span> <span class="fu">list</span>(<span class="at">continuous =</span> <span class="st">"barDiag"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">20</span>))</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>heart_disease_pairplot </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project_files/figure-html/cell-9-output-2.svg" width="600" height="600" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><font size="1"> Figure 1 - Training Data Set Pairs Plot</font></p><font size="1">
+<p>Looking at the results produced from this plot, we see that in general the predictor variables have little to no correlation between them signified by the coefficients being close to 0 for the most part. However, we see that the variable <code>thalach</code> (maximum heart rate achieved) has a noticeable negative correlation with <code>age</code> and <code>oldpeak</code> where as age and ST depression induced by exercise increase, maximum heart rate tends to decrease.</p>
+<p>More importantly, we see that the variable <code>ca</code> (number of major vessels colored by fluoroscopy) shows a positive correlation with our target variable, suggesting that as the number of detected vessels increases, so does the likelihood of a heart disease diagnosis.</p>
+<p>With the preliminary exploration of our data complete, we are now ready to determine a grouping of our classification models. We believe that a beneficial way to approach the problem at hand would be to group our predictors by the testing data techniques.</p>
+<p>As such, the first model will include <code>age</code>, <code>trestbps</code>, and <code>chol</code> as they are all either clinical or routine test data results. The second model will include <code>thalach</code> and <code>oldpeak</code> as they are exercise induced data results, and lastly <code>ca</code> will be in its own model as it refers to the fluoroscopy for coronary calcium results and our exploration revealed that it already has positive correlation with our target variable.</p>
+<p>We now begin with the analysis of our data. It is important to note that we will be explicitly outlining the steps for our first model only as the other two models will follow the same procedure.</p>
+<p><strong>First Model：<code>age</code>, <code>trestbps</code>, and <code>chol</code> (all either clinical or routine test data results.)</strong></p>
+<p>Our first step is to create a recipe that uses all the predictors in our model and a model specification with tuning on the number of neighbours.</p>
+<div id="755ba4c6-e083-4023-bc91-015e0c4d9576" class="cell" data-tags="[]" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># recipe</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>heart_disease_recipe_1 <span class="ot">&lt;-</span> <span class="fu">recipe</span>(num <span class="sc">~</span> age <span class="sc">+</span> trestbps <span class="sc">+</span> chol , <span class="at">data =</span> heart_disease_train) <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_scale</span>(<span class="fu">all_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_center</span>(<span class="fu">all_predictors</span>())</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>heart_disease_recipe_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Recipe
+
+Inputs:
+
+      role #variables
+   outcome          1
+ predictor          3
+
+Operations:
+
+Scaling for all_predictors()
+Centering for all_predictors()</code></pre>
+</div>
+</div>
+<div id="aa4bdbb9-5cb7-43ec-8356-cdf88733305d" class="cell" data-tags="[]" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># model specification</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>heart_disease_spec <span class="ot">&lt;-</span> <span class="fu">nearest_neighbor</span>(<span class="at">weight_func =</span> <span class="st">"rectangular"</span>, <span class="at">neighbors =</span> <span class="fu">tune</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">set_engine</span>(<span class="st">"kknn"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next, we perform a 5-fold cross-validation on the training set and we determine a range of possible “k” values (neighbors). We choose to try “k” to be between 1 and 20.</p>
+<div id="68c462cc-1af7-4196-88d4-1b3f68c718f3" class="cell" data-tags="[]" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#cross validation with v = 5</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>heart_disease_vfold <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(heart_disease_train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> num)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="88e4cb31-79b4-4811-97f5-8fbfe094e9f1" class="cell" data-tags="[]" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#set up possible values of k</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>k_vals <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">neighbors =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">1</span>, <span class="at">to =</span> <span class="dv">20</span>, <span class="at">by =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then, we create a workflow analysis with our recipe and model specification across the range of our “k” values. We also collect the metrics from this workflow analysis and filter for <code>accuracy</code> from the <code>.metric</code> column to use it to determine accuracies in the next steps.</p>
+<div id="48f374b1-d5c9-4549-bfa8-a032b01ad0a4" class="cell" data-tags="[]" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#finding accuracies</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>knn_results <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">add_recipe</span>(heart_disease_recipe_1) <span class="sc">|&gt;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">add_model</span>(heart_disease_spec) <span class="sc">|&gt;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>       <span class="fu">tune_grid</span>(<span class="at">resamples =</span> heart_disease_vfold, <span class="at">grid =</span> k_vals) <span class="sc">|&gt;</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>       <span class="fu">collect_metrics</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! Fold1: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold2: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold3: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold4: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold5: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+</code></pre>
+</div>
+</div>
+<div id="7b3e1c68-019d-427e-8adc-6175b0e954f3" class="cell" data-tags="[]" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#filtering for only accuracy</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>accuracies <span class="ot">&lt;-</span> knn_results <span class="sc">|&gt;</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"accuracy"</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>accuracies</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 20 × 7</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">neighbors</th>
+<th data-quarto-table-cell-role="th" scope="col">.metric</th>
+<th data-quarto-table-cell-role="th" scope="col">.estimator</th>
+<th data-quarto-table-cell-role="th" scope="col">mean</th>
+<th data-quarto-table-cell-role="th" scope="col">n</th>
+<th data-quarto-table-cell-role="th" scope="col">std_err</th>
+<th data-quarto-table-cell-role="th" scope="col">.config</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;int&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.5535354</td>
+<td>5</td>
+<td>0.02800231</td>
+<td>Preprocessor1_Model01</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.5535354</td>
+<td>5</td>
+<td>0.02800231</td>
+<td>Preprocessor1_Model02</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.5718182</td>
+<td>5</td>
+<td>0.02143605</td>
+<td>Preprocessor1_Model03</td>
+</tr>
+<tr class="even">
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+</tr>
+<tr class="odd">
+<td>18</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.6258586</td>
+<td>5</td>
+<td>0.02400313</td>
+<td>Preprocessor1_Model18</td>
+</tr>
+<tr class="even">
+<td>19</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.6259596</td>
+<td>5</td>
+<td>0.02147302</td>
+<td>Preprocessor1_Model19</td>
+</tr>
+<tr class="odd">
+<td>20</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.6259596</td>
+<td>5</td>
+<td>0.02147302</td>
+<td>Preprocessor1_Model20</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 6 - Aggregated Mean and Std. Error across the Folds (Model 1)</font></p><font size="1">
+<p>Lastly, we determine the max accuracy value to guide us to picking the optimal number of neighbors in our prediction. We can plot the <code>accuracies</code> data set with <code>neighbors</code> on the x-axis and the <code>mean</code> on the y-axis, or we can produce the maximum mean value and use its corresponding neighbor. We do both below.</p>
+<div id="8bb0a2e2-2882-44e0-9925-8b7910dfdeb5" class="cell" data-tags="[]" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#finding max accuracy</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>max_accuracy <span class="ot">&lt;-</span> <span class="fu">summarize</span>(accuracies, <span class="at">accuracy =</span> <span class="fu">max</span>(mean))</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>max_accuracy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 1 × 1</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">accuracy</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.6259596</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="118cb2bf-024b-4be3-88a4-b6f45a9477d5" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#plotting accuracy</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">repr.plot.width =</span> <span class="dv">7</span>, <span class="at">repr.plot.height =</span> <span class="dv">7</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>accuracy_versus_k <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(accuracies, <span class="fu">aes</span>(<span class="at">x =</span> neighbors, <span class="at">y =</span> mean))<span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>       <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>       <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Neighbors"</span>, <span class="at">y =</span> <span class="st">"Accuracy Estimate"</span>) <span class="sc">+</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">20</span>, <span class="at">by =</span> <span class="dv">1</span>)) <span class="sc">+</span>  </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>       <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">1.0</span>)) </span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>accuracy_versus_k</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project_files/figure-html/cell-17-output-1.svg" width="420" height="420" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><font size="1"> Figure 2 - Accuracy Vs. K Line Plot (Model 1)</font></p><font size="1">
+<p>We repeat the same steps for the other models below.</p>
+<p><strong>Second Model:<code>thalach</code> and <code>oldpeak</code> (exercise induced data results)</strong></p>
+<div id="65f7202c-341b-4461-aae4-2a1dd3d638bf" class="cell" data-tags="[]" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>heart_disease_recipe_2 <span class="ot">&lt;-</span> <span class="fu">recipe</span>(num <span class="sc">~</span> thalach <span class="sc">+</span> oldpeak  , <span class="at">data =</span> heart_disease_train) <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_scale</span>(<span class="fu">all_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_center</span>(<span class="fu">all_predictors</span>()) </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>heart_disease_recipe_2</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>heart_disease_vfold <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(heart_disease_train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> num)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>k_vals <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">neighbors =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">1</span>, <span class="at">to =</span> <span class="dv">20</span>, <span class="at">by =</span> <span class="dv">1</span>))</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>knn_results <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">add_recipe</span>(heart_disease_recipe_2) <span class="sc">|&gt;</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>       <span class="fu">add_model</span>(heart_disease_spec) <span class="sc">|&gt;</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>       <span class="fu">tune_grid</span>(<span class="at">resamples =</span> heart_disease_vfold, <span class="at">grid =</span> k_vals) <span class="sc">|&gt;</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>       <span class="fu">collect_metrics</span>()</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>accuracies <span class="ot">&lt;-</span> knn_results <span class="sc">|&gt;</span> </span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>       <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"accuracy"</span>)</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>accuracies</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>max_accuracies <span class="ot">&lt;-</span> <span class="fu">summarize</span>(accuracies, <span class="at">accuracy =</span> <span class="fu">max</span>(mean))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Recipe
+
+Inputs:
+
+      role #variables
+   outcome          1
+ predictor          2
+
+Operations:
+
+Scaling for all_predictors()
+Centering for all_predictors()</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! Fold1: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold2: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold3: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold4: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold5: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 20 × 7</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">neighbors</th>
+<th data-quarto-table-cell-role="th" scope="col">.metric</th>
+<th data-quarto-table-cell-role="th" scope="col">.estimator</th>
+<th data-quarto-table-cell-role="th" scope="col">mean</th>
+<th data-quarto-table-cell-role="th" scope="col">n</th>
+<th data-quarto-table-cell-role="th" scope="col">std_err</th>
+<th data-quarto-table-cell-role="th" scope="col">.config</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;int&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.6673737</td>
+<td>5</td>
+<td>0.04653311</td>
+<td>Preprocessor1_Model01</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.6943434</td>
+<td>5</td>
+<td>0.04368188</td>
+<td>Preprocessor1_Model02</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.7124242</td>
+<td>5</td>
+<td>0.05292524</td>
+<td>Preprocessor1_Model03</td>
+</tr>
+<tr class="even">
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+</tr>
+<tr class="odd">
+<td>18</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.7349495</td>
+<td>5</td>
+<td>0.03722239</td>
+<td>Preprocessor1_Model18</td>
+</tr>
+<tr class="even">
+<td>19</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.7439394</td>
+<td>5</td>
+<td>0.03740751</td>
+<td>Preprocessor1_Model19</td>
+</tr>
+<tr class="odd">
+<td>20</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.7484848</td>
+<td>5</td>
+<td>0.03920539</td>
+<td>Preprocessor1_Model20</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 7 - Aggregated Mean and Std. Error across the Folds (Model 2)</font></p><font size="1">
+<div id="0b161c43-dad5-4ffd-927f-a44f308dbc60" class="cell" data-tags="[]" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">repr.plot.width =</span> <span class="dv">7</span>, <span class="at">repr.plot.height =</span> <span class="dv">7</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>accuracy_versus_k <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(accuracies, <span class="fu">aes</span>(<span class="at">x =</span> neighbors, <span class="at">y =</span> mean))<span class="sc">+</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>       <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Neighbors"</span>, <span class="at">y =</span> <span class="st">"Accuracy Estimate"</span>) <span class="sc">+</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>       <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">20</span>, <span class="at">by =</span> <span class="dv">1</span>)) <span class="sc">+</span> </span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">1.0</span>)) </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>accuracy_versus_k</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project_files/figure-html/cell-19-output-1.svg" width="420" height="420" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><font size="1"> Figure 3 - Accuracy Vs. K Line Plot (Model 2)</font></p><font size="1">
+<p><strong>Third Model: <code>ca</code> (refers to the fluoroscopy for coronary calcium results)</strong></p>
+<div id="2ea282d9-3aea-4d4d-8903-d575a0d8a075" class="cell" data-tags="[]" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>heart_disease_recipe_3 <span class="ot">&lt;-</span> <span class="fu">recipe</span>(num <span class="sc">~</span> ca , <span class="at">data =</span> heart_disease_train) <span class="sc">|&gt;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_scale</span>(<span class="fu">all_predictors</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_center</span>(<span class="fu">all_predictors</span>()) </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>heart_disease_recipe_3</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>heart_disease_vfold <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(heart_disease_train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> num)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>k_vals <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">neighbors =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">1</span>, <span class="at">to =</span> <span class="dv">20</span>, <span class="at">by =</span> <span class="dv">1</span>))</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>knn_results <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">add_recipe</span>(heart_disease_recipe_3) <span class="sc">|&gt;</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>       <span class="fu">add_model</span>(heart_disease_spec) <span class="sc">|&gt;</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>       <span class="fu">tune_grid</span>(<span class="at">resamples =</span> heart_disease_vfold, <span class="at">grid =</span> k_vals) <span class="sc">|&gt;</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>       <span class="fu">collect_metrics</span>()</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>accuracies <span class="ot">&lt;-</span> knn_results <span class="sc">|&gt;</span> </span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>       <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"accuracy"</span>)</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>accuracies</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>max_accuracies <span class="ot">&lt;-</span> <span class="fu">summarize</span>(accuracies, <span class="at">accuracy =</span> <span class="fu">max</span>(mean))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Recipe
+
+Inputs:
+
+      role #variables
+   outcome          1
+ predictor          1
+
+Operations:
+
+Scaling for all_predictors()
+Centering for all_predictors()</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! Fold1: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold2: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold3: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold4: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+
+! Fold5: internal:
+  There were 20 warnings in `dplyr::summarise()`.
+  The first warning was:
+  ℹ In argument: `.estimate = metric_fn(...)`.
+  ℹ In group 1: `neighbors = 1`.
+  Caused by warning:
+  ! No observations were detected in `truth` for level(s): '2'...
+  Computation will proceed by ignoring those levels.
+  ℹ Run `dplyr::last_dplyr_warnings()` to see the 19 ...
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 20 × 7</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">neighbors</th>
+<th data-quarto-table-cell-role="th" scope="col">.metric</th>
+<th data-quarto-table-cell-role="th" scope="col">.estimator</th>
+<th data-quarto-table-cell-role="th" scope="col">mean</th>
+<th data-quarto-table-cell-role="th" scope="col">n</th>
+<th data-quarto-table-cell-role="th" scope="col">std_err</th>
+<th data-quarto-table-cell-role="th" scope="col">.config</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;int&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.5451515</td>
+<td>5</td>
+<td>0.006363636</td>
+<td>Preprocessor1_Model01</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.5406061</td>
+<td>5</td>
+<td>0.002969078</td>
+<td>Preprocessor1_Model02</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.5406061</td>
+<td>5</td>
+<td>0.002969078</td>
+<td>Preprocessor1_Model03</td>
+</tr>
+<tr class="even">
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+</tr>
+<tr class="odd">
+<td>18</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.6624242</td>
+<td>5</td>
+<td>0.01587948</td>
+<td>Preprocessor1_Model18</td>
+</tr>
+<tr class="even">
+<td>19</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.6578788</td>
+<td>5</td>
+<td>0.01512422</td>
+<td>Preprocessor1_Model19</td>
+</tr>
+<tr class="odd">
+<td>20</td>
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.6578788</td>
+<td>5</td>
+<td>0.01512422</td>
+<td>Preprocessor1_Model20</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 8 - Aggregated Mean and Std. Error across the Folds (Model 3)</font></p><font size="1">
+<div id="de7548c4-69c3-4879-aa1b-b8c69de33c11" class="cell" data-tags="[]" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">repr.plot.width =</span> <span class="dv">7</span>, <span class="at">repr.plot.height =</span> <span class="dv">7</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>accuracy_versus_k <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(accuracies, <span class="fu">aes</span>(<span class="at">x =</span> neighbors, <span class="at">y =</span> mean))<span class="sc">+</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>       <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>       <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Neighbors"</span>, <span class="at">y =</span> <span class="st">"Accuracy Estimate"</span>) <span class="sc">+</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>       <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">20</span>, <span class="at">by =</span> <span class="dv">1</span>)) <span class="sc">+</span> </span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">1.0</span>)) </span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>accuracy_versus_k</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project_files/figure-html/cell-21-output-1.svg" width="420" height="420" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><font size="1"> Figure 4 - Accuracy Vs. K Line Plot (Model 3)</font></p><font size="1">
+<p>Going back to our first model, we now recreate the model using the best <code>k</code> value as identified in the steps above. we also fit the workflow with our training data set.</p>
+<div id="d90c25fb-fd8b-46d6-8555-304232df395b" class="cell" data-tags="[]" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#recreate the model using the best K value</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>knn_spec_1 <span class="ot">&lt;-</span> <span class="fu">nearest_neighbor</span>(<span class="at">weight_func =</span> <span class="st">"rectangular"</span>, <span class="at">neighbors =</span> <span class="dv">19</span>) <span class="sc">|&gt;</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"kknn"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>knn_spec_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>K-Nearest Neighbor Model Specification (classification)
+
+Main Arguments:
+  neighbors = 19
+  weight_func = rectangular
+
+Computational engine: kknn </code></pre>
+</div>
+</div>
+<div id="2e489e8b-20aa-46e3-91fb-e130c056e14a" class="cell" data-tags="[]" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co">#fit the model with train data</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>knn_fit_1 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(heart_disease_recipe_1) <span class="sc">|&gt;</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(knn_spec_1) <span class="sc">|&gt;</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> heart_disease_train)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>knn_fit_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div class="ansi-escaped-output">
+<pre>══ Workflow [trained] ══════════════════════════════════════════════════════════
+<span style="font-style:italic">Preprocessor:</span> Recipe
+<span style="font-style:italic">Model:</span> nearest_neighbor()
+── Preprocessor ────────────────────────────────────────────────────────────────
+2 Recipe Steps
+• step_scale()
+• step_center()
+── Model ───────────────────────────────────────────────────────────────────────
+Call:
+kknn::train.kknn(formula = ..y ~ ., data = data, ks = min_rows(19,     data, 5), kernel = ~"rectangular")
+Type of response variable: nominal
+Minimal misclassification: 0.3558559
+Best kernel: rectangular
+Best k: 19</pre>
+</div>
+</div>
+</div>
+<p>Lastly, we predict the target value with the test data and find out the accuracy of our classification.</p>
+<div id="6520ce6b-99d4-44d2-9783-59f096a7c8be" class="cell" data-tags="[]" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#predict the target value with test data and find out the accuracy</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>heart_disease_test_predictions_1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn_fit_1, heart_disease_test) <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(heart_disease_test)<span class="sc">|&gt;</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> num, <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"accuracy"</span>)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>heart_disease_test_predictions_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 1 × 3</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">.metric</th>
+<th data-quarto-table-cell-role="th" scope="col">.estimator</th>
+<th data-quarto-table-cell-role="th" scope="col">.estimate</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.52</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 9 - Model 1 Prediction Accuracy with Optimal K</font></p><font size="1">
+<p>We recreate the same steps with the other two models.</p>
+<div id="114cca3f-9031-4e6e-8e90-17af4e9403b8" class="cell" data-tags="[]" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Do the same with the second model we created above</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>knn_spec_2 <span class="ot">&lt;-</span> <span class="fu">nearest_neighbor</span>(<span class="at">weight_func =</span> <span class="st">"rectangular"</span>, <span class="at">neighbors =</span> <span class="dv">7</span>) <span class="sc">|&gt;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"kknn"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>knn_spec_2</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>knn_fit_2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(heart_disease_recipe_2) <span class="sc">|&gt;</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(knn_spec_2) <span class="sc">|&gt;</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> heart_disease_train)</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>knn_fit_2</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>heart_disease_test_predictions_2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn_fit_2, heart_disease_test) <span class="sc">|&gt;</span></span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(heart_disease_test)<span class="sc">|&gt;</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> num, <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"accuracy"</span>)</span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>heart_disease_test_predictions_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>K-Nearest Neighbor Model Specification (classification)
+
+Main Arguments:
+  neighbors = 7
+  weight_func = rectangular
+
+Computational engine: kknn </code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div class="ansi-escaped-output">
+<pre>══ Workflow [trained] ══════════════════════════════════════════════════════════
+<span style="font-style:italic">Preprocessor:</span> Recipe
+<span style="font-style:italic">Model:</span> nearest_neighbor()
+── Preprocessor ────────────────────────────────────────────────────────────────
+2 Recipe Steps
+• step_scale()
+• step_center()
+── Model ───────────────────────────────────────────────────────────────────────
+Call:
+kknn::train.kknn(formula = ..y ~ ., data = data, ks = min_rows(7,     data, 5), kernel = ~"rectangular")
+Type of response variable: nominal
+Minimal misclassification: 0.2972973
+Best kernel: rectangular
+Best k: 7</pre>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 1 × 3</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">.metric</th>
+<th data-quarto-table-cell-role="th" scope="col">.estimator</th>
+<th data-quarto-table-cell-role="th" scope="col">.estimate</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.64</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 10 - Model 2 Prediction Accuracy with Optimal K</font></p><font size="1">
+<div id="80ab6c72-45e2-4282-ad8e-fe9bf5accad9" class="cell" data-tags="[]" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Do the same with the second model we created above</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>knn_spec_3 <span class="ot">&lt;-</span> <span class="fu">nearest_neighbor</span>(<span class="at">weight_func =</span> <span class="st">"rectangular"</span>, <span class="at">neighbors =</span> <span class="dv">13</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"kknn"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>knn_spec_3</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>knn_fit_3 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(heart_disease_recipe_3) <span class="sc">|&gt;</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(knn_spec_3) <span class="sc">|&gt;</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> heart_disease_train)</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>knn_fit_3</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>heart_disease_test_predictions_3 <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn_fit_3, heart_disease_test) <span class="sc">|&gt;</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(heart_disease_test)<span class="sc">|&gt;</span></span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> num, <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"accuracy"</span>)</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>heart_disease_test_predictions_3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>K-Nearest Neighbor Model Specification (classification)
+
+Main Arguments:
+  neighbors = 13
+  weight_func = rectangular
+
+Computational engine: kknn </code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div class="ansi-escaped-output">
+<pre>══ Workflow [trained] ══════════════════════════════════════════════════════════
+<span style="font-style:italic">Preprocessor:</span> Recipe
+<span style="font-style:italic">Model:</span> nearest_neighbor()
+── Preprocessor ────────────────────────────────────────────────────────────────
+2 Recipe Steps
+• step_scale()
+• step_center()
+── Model ───────────────────────────────────────────────────────────────────────
+Call:
+kknn::train.kknn(formula = ..y ~ ., data = data, ks = min_rows(13,     data, 5), kernel = ~"rectangular")
+Type of response variable: nominal
+Minimal misclassification: 0.3378378
+Best kernel: rectangular
+Best k: 13</pre>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>A tibble: 1 × 3</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">.metric</th>
+<th data-quarto-table-cell-role="th" scope="col">.estimator</th>
+<th data-quarto-table-cell-role="th" scope="col">.estimate</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;chr&gt;</th>
+<th data-quarto-table-cell-role="th" scope="col">&lt;dbl&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>accuracy</td>
+<td>multiclass</td>
+<td>0.68</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><font size="1"> Table 11 - Model 3 Prediction Accuracy with Optimal K</font></p><font size="1">
+</font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></section><font size="1"><font size="1"><font size="1">
+<section id="discussion" class="level3">
+<h3 class="anchored" data-anchor-id="discussion">Discussion</h3>
+<p>Through extensive data exploration and pre-processing, we selected potential variables and categorized various factors. We created three distinct models based on different feature variables, each connected with angiographic disease status. This project significantly contributes to predicting the presence of heart disease based on patients’ health conditions.</p>
+<p>Overall, our models demonstrated an accuracy consistently above 50%, aligning with our definition of “predictable” . These variables prove effective in predicting the presence or absence of heart disease in patients.</p>
+<p>Leveraging these findings in conjunction with patient clinical and demographic data, we want to create a precision medicine framework for heart disease prediction. Collaborations between healthcare professionals and our models can notably enhance diagnostic accuracy and confidence while reducing the possibility of misdiagnosis.</p>
+<p>Despite achieving accuracies surpassing 68% with limited data, these models are not yet suitable for direct clinical use. Medical model evaluations typically involve offline and on-line assessments. Presently, our evaluations are solely offline and based on historical data, potentially deviating from real-life scenarios. To ensure ongoing model relevance, live data integration is imperative.</p>
+<p>Additionally, to enhance accuracy, further model diversification and selection based on the outlined methodology could be pursued. In the future, we are interested in identifying additional crucial factors influencing model judgments beyond what Knn offers and assessing the deployability and practical applicability of our models in real-world healthcare settings remain essential considerations</p>
+</section>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
+<p>Jain, V., Chatterjee, J. M., SpringerLink (Online service), &amp; Springer Intelligent Technologies and Robotics eBooks 2020 English/International. (2020). In Jain V., Chatterjee J. M.(Eds.), Machine learning with health care perspective: Machine learning and healthcare (1st 2020.;1;1st; ed.). Springer International Publishing. https://doi.org/10.1007/978-3-030-40850-3</p>
+<p>Jindal, H., Agrawal, S., Khera, R., Jain, R., &amp; Nagrath, P. (2021). Heart disease prediction using machine learning algorithms. IOP Conference Series. Materials Science and Engineering, 1022(1), 12072. https://doi.org/10.1088/1757-899X/1022/1/012072</p>
+</section>
+
+</font></font></font></main><font size="1"><font size="1"><font size="1">
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</font></font></font></div><font size="1"><font size="1"><font size="1"> <!-- /content -->
+
+
+
+
+</font></font></font></body></html>
